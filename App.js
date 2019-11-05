@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   StyleSheet,
   Text,
@@ -39,19 +39,71 @@ const App = () => {
           createdAt: Date.now()
         }
       }
-      setTodos(currentTodos => {
-        return { ...currentTodos, ...tempTodo }
+      setTodos( prevTodos => {
+        return { ...prevTodos, ...tempTodo }
       });
       setNewTodo('');
     }
   }
   const deleteTodo = id => {
-    setTodos(currentTodo => {
-      const tempTodo = currentTodo;
+    setTodos(prevTodo => {
+      const tempTodo = prevTodo;
       delete tempTodo[id];
-      return { ...tempTodo }
+      return { ...tempTodo };
     });
   }
+  const completeTodo = id => {
+    setTodos(prevTodo => {
+      const tempTodo = {
+         ...prevTodo,
+         [id]: {
+           ...prevTodo[id],
+           complete: true
+         }
+      }
+      return { ...tempTodo }
+    })
+  }
+  const uncompleteTodo = id => {
+    setTodos(prevTodo => {
+      const tempTodo = {
+         ...prevTodo,
+         [id]: {
+           ...prevTodo[id],
+           complete: false
+         }
+      }
+      return { ...tempTodo }
+    })
+  }
+  const updateTodo = ( id, text ) => {
+    setTodos(prevTodo => {
+      const tempTodo = {
+        ...prevTodo,
+        [id]: {
+          ...prevTodo[id],
+          text: text
+        }
+      }
+      return { ...tempTodo }
+    })
+  }
+  // 수정 버튼 클릭하면 자동 포커스 되게 만들어 보기!!
+  // const useFocus = () => {
+  //   const element = useRef();    
+  //   useEffect( () => {
+  //     if( element.current ){
+  //       element.current.addEventListener('click', element.current.focus());
+  //     }
+  //     return () => {
+  //       if( element.current){
+  //         element.current.removeEventListener('click', element.current.focus());
+  //       }
+  //     }
+  //   }, [])
+
+  //   return element
+  // }
 
   useEffect(() => {
     loadTodos();
@@ -77,12 +129,15 @@ const App = () => {
           onSubmitEditing={addTodo}>
         </TextInput>
         <ScrollView contentContainerStyle={styles.todos}>
-          {Object.values(todos).map(todo => 
-            <Todo 
-              key={todo.id} 
+          {Object.values(todos).map(todo =>
+            <Todo
+              key={todo.id}
               {...todo}
               isComplete={todo.complete}
               deleteTodo={deleteTodo}
+              completeTodo={completeTodo}
+              uncompleteTodo={uncompleteTodo}
+              updateTodo={updateTodo}
             />
           )}
           <Text>{JSON.stringify(todos)}</Text>

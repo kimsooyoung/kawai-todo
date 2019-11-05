@@ -16,24 +16,26 @@ const CIRCLE_RADIUS = 16;
 const ICON_SIZE = 27;
 const MAX_TODO_LEN = 14;
 
-const Todo = ({ id, text, isComplete, deleteTodo }) => {
+const Todo = ({ id, text, isComplete, deleteTodo, completeTodo, uncompleteTodo, updateTodo }) => {
     const [editMode, setEditMode] = useState(false);
-    const [complete, setComplete] = useState(isComplete);
+    // const [complete, setComplete] = useState(isComplete);
     const [editValue, setEditValue] = useState(text);
 
-    const toggleComplete = useCallback(
-        () => {
-            // console.log('dfdf');
-            setComplete(complete => !complete);
-        },
-        [complete],
-    );
+    const toggleComplete = id => {
+        // console.log('dfdf');
+        if ( isComplete ) {
+            uncompleteTodo(id);
+        } else {
+            completeTodo(id);
+        }
+    }
     const startEditting = () => {
         // setEditValue(text);
         setEditMode(true);
     }
     const endEditting = () => {
         // setEditValue()
+        updateTodo(id, editValue);
         setEditMode(false);
     }
     const onChangeText = (text) => {
@@ -43,11 +45,11 @@ const Todo = ({ id, text, isComplete, deleteTodo }) => {
     return (
         <View style={styles.container}>
             <View style={styles.column}>
-                <TouchableOpacity onPress={toggleComplete}>
+                <TouchableOpacity onPress={() => toggleComplete(id)}>
                     {/* <MaterialCommunityIcons name='checkbox-blank-outline' size={32}></MaterialCommunityIcons> */}
                     <View style={[
                         styles.circle,
-                        complete ? styles.completedCircle : styles.uncompltedCircle
+                        isComplete ? styles.completedCircle : styles.uncompltedCircle
                     ]}/>
                 </TouchableOpacity>
                 {editMode ?
@@ -57,7 +59,7 @@ const Todo = ({ id, text, isComplete, deleteTodo }) => {
                         style={[
                             styles.input,
                             styles.text,
-                            complete ? styles.completedText : styles.uncompltedText
+                            isComplete ? styles.completedText : styles.uncompltedText
                         ]}
                         onChangeText={onChangeText}
                         returnKeyType={'done'}
@@ -67,7 +69,7 @@ const Todo = ({ id, text, isComplete, deleteTodo }) => {
                     <Text
                         style={[
                             styles.text, 
-                            complete ? styles.completedText : styles.uncompltedText
+                            isComplete ? styles.completedText : styles.uncompltedText
                             ]}>
                         {editValue.length > MAX_TODO_LEN ? editValue.slice(0, MAX_TODO_LEN) + '...' : editValue}
                     </Text>
@@ -101,7 +103,10 @@ Todo.propTypes = {
     id: PropTypes.string.isRequired,
     isComplete: PropTypes.bool.isRequired,
     text: PropTypes.string.isRequired,
-    deleteTodo: PropTypes.func.isRequired
+    deleteTodo: PropTypes.func.isRequired,
+    completeTodo: PropTypes.func.isRequired,
+    uncompleteTodo: PropTypes.func.isRequired,
+    updateTodo: PropTypes.func.isRequired,
 }
 
 const styles = StyleSheet.create({
