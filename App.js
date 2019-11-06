@@ -7,7 +7,8 @@ import {
   TextInput,
   Dimensions,
   Platform,
-  ScrollView
+  ScrollView,
+  AsyncStorage,
 } from 'react-native';
 import Todo from './Todo';
 import { AppLoading } from 'expo';
@@ -23,9 +24,19 @@ const App = () => {
   const onChangeText = (text) => {
     setNewTodo(text);
   }
-  const loadTodos = () => {
+  const loadTodos = async () => {
     // loading in here
-    setLoading(false);
+    try {
+      const getTodo = await AsyncStorage.getItem('todos');
+      const parseTodo = JSON.parse(getTodo);
+      setTodos(parseTodo);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  const saveTodo = currnetTodo => {
+    const saving = AsyncStorage.setItem('todos', JSON.stringify(currnetTodo));
   }
   const addTodo = () => {
     if (newTodo !== '') {
@@ -33,14 +44,15 @@ const App = () => {
       const id = uuidv1();
       const tempTodo = {
         [id]: {
-          id,
+          id: id,
           complete: false,
           text: newTodo,
           createdAt: Date.now()
         }
       }
-      setTodos( prevTodos => {
-        return { ...prevTodos, ...tempTodo }
+      setTodos( prevTodo => {
+        saveTodo( { ...prevTodo, ...tempTodo } );
+        return { ...prevTodo, ...tempTodo }
       });
       setNewTodo('');
     }
@@ -49,32 +61,33 @@ const App = () => {
     setTodos(prevTodo => {
       const tempTodo = prevTodo;
       delete tempTodo[id];
+      saveTodo( todos );
       return { ...tempTodo };
     });
   }
   const completeTodo = id => {
-    setTodos(prevTodo => {
-      const tempTodo = {
-         ...prevTodo,
-         [id]: {
-           ...prevTodo[id],
-           complete: true
-         }
+    const tempTodo = {
+      ...todos,
+      [id]: {
+        ...todos[id],
+        complete: true
       }
-      return { ...tempTodo }
-    })
+    }
+    // console.log( tempTodo );
+    saveTodo( tempTodo );
+    setTodos( tempTodo );
   }
   const uncompleteTodo = id => {
-    setTodos(prevTodo => {
-      const tempTodo = {
-         ...prevTodo,
-         [id]: {
-           ...prevTodo[id],
-           complete: false
-         }
-      }
-      return { ...tempTodo }
-    })
+    const tempTodo = {
+       ...todos,
+       [id]: {
+         ...todos[id],
+         complete: false
+       }
+    }
+    // console.log( tempTodo );
+    saveTodo( tempTodo );
+    setTodos( tempTodo );
   }
   const updateTodo = ( id, text ) => {
     setTodos(prevTodo => {
@@ -85,7 +98,8 @@ const App = () => {
           text: text
         }
       }
-      return { ...tempTodo }
+      saveTodo( tempTodo );
+      return { ...tempTodo };
     })
   }
   // 수정 버튼 클릭하면 자동 포커스 되게 만들어 보기!!
@@ -129,18 +143,22 @@ const App = () => {
           onSubmitEditing={addTodo}>
         </TextInput>
         <ScrollView contentContainerStyle={styles.todos}>
-          {Object.values(todos).map(todo =>
-            <Todo
-              key={todo.id}
-              {...todo}
-              isComplete={todo.complete}
+          {console.log('-----------------------')}
+          {Object.values(todos).map(item => {
+            console.log(item);
+            return <Todo
+              key={item.id}
+              id={item.id}
+              isComplete={item.complete}
               deleteTodo={deleteTodo}
-              completeTodo={completeTodo}
               uncompleteTodo={uncompleteTodo}
+              completeTodo={completeTodo}
               updateTodo={updateTodo}
-            />
+              text={item.text}
+              // {...item}
+            />}
           )}
-          <Text>{JSON.stringify(todos)}</Text>
+          <Text>{JSON.stringify(todos, undefined, 2)}</Text>
         </ScrollView>
       </View>
     </View>
