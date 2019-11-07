@@ -143,9 +143,10 @@ const App = () => {
           onSubmitEditing={addTodo}>
         </TextInput>
         <ScrollView contentContainerStyle={styles.todos}>
-          {console.log('-----------------------')}
-          {Object.values(todos).map(item => {
-            console.log(item);
+          {console.log('-----------------------', todos)}
+          {todos === null ? (null):(
+            Object.values(todos).map(item => {
+            // console.log(item);
             return <Todo
               key={item.id}
               id={item.id}
@@ -157,8 +158,8 @@ const App = () => {
               text={item.text}
               // {...item}
             />}
-          )}
-          <Text>{JSON.stringify(todos, undefined, 2)}</Text>
+          ))}
+          {/* <Text>{JSON.stringify(todos, undefined, 2)}</Text> */}
         </ScrollView>
       </View>
     </View>
