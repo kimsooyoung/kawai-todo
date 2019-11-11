@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
     Text,
     View,
@@ -20,6 +20,7 @@ const Todo = ({ id, text, isComplete, deleteTodo, completeTodo, uncompleteTodo, 
     const [editMode, setEditMode] = useState(false);
     // const [complete, setComplete] = useState(isComplete);
     const [editValue, setEditValue] = useState(text);
+    const inputRef = useRef();
 
     const toggleComplete = id => {
         // console.log('dfdf');
@@ -31,6 +32,9 @@ const Todo = ({ id, text, isComplete, deleteTodo, completeTodo, uncompleteTodo, 
     }
     const startEditting = () => {
         // setEditValue(text);
+        // if( inputRef.current ){
+        //     inputRef.current.focus();
+        // }
         setEditMode(true);
     }
     const endEditting = () => {
@@ -41,6 +45,12 @@ const Todo = ({ id, text, isComplete, deleteTodo, completeTodo, uncompleteTodo, 
     const onChangeText = (text) => {
         setEditValue(text);
     }
+
+    useEffect(() => {
+        if(editMode){
+            inputRef.current.focus();
+        }
+    }, [ editMode ]);
 
     return (
         <View style={styles.container}>
@@ -54,6 +64,7 @@ const Todo = ({ id, text, isComplete, deleteTodo, completeTodo, uncompleteTodo, 
                 </TouchableOpacity>
                 {editMode ?
                     (<TextInput
+                        ref={inputRef}
                         value={editValue}
                         multiline={true}
                         style={[
@@ -62,6 +73,8 @@ const Todo = ({ id, text, isComplete, deleteTodo, completeTodo, uncompleteTodo, 
                             isComplete ? styles.completedText : styles.uncompltedText
                         ]}
                         onChangeText={onChangeText}
+                        onSubmitEditing={() => console.log('test')}
+                        keyboardType='default'
                         returnKeyType={'done'}
                         onBlur={endEditting}
                     />

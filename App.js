@@ -103,15 +103,15 @@ const App = () => {
     })
   }
   // 수정 버튼 클릭하면 자동 포커스 되게 만들어 보기!!
-  // const useFocus = () => {
-  //   const element = useRef();    
+  // const useFocus = onClick => {
+  //   const element = useRef();
   //   useEffect( () => {
   //     if( element.current ){
-  //       element.current.addEventListener('click', element.current.focus());
+  //       element.current.addEventListener('click', onClick);
   //     }
   //     return () => {
   //       if( element.current){
-  //         element.current.removeEventListener('click', element.current.focus());
+  //         element.current.removeEventListener('click', onClick);
   //       }
   //     }
   //   }, [])
@@ -145,7 +145,9 @@ const App = () => {
         <ScrollView contentContainerStyle={styles.todos}>
           {console.log('-----------------------', todos)}
           {todos === null ? (null):(
-            Object.values(todos).map(item => {
+            Object.values(todos).sort( ( a, b ) => {
+              return a.createdAt - b.createdAt
+            }).map(item => {
             // console.log(item);
             return <Todo
               key={item.id}
