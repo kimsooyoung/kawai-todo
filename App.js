@@ -130,7 +130,7 @@ const App = () => {
   return (
     <View style={styles.container}>
       <StatusBar barStyle='light-content'></StatusBar>
-      <Text style={styles.title}>Kawai Todo!</Text>
+      <Text style={styles.title}>Kawai Todo</Text>
       <View style={styles.card}>
         <TextInput
           value={newTodo}

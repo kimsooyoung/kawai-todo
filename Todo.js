@@ -22,23 +22,26 @@ const Todo = ({ id, text, isComplete, deleteTodo, completeTodo, uncompleteTodo, 
     const [editValue, setEditValue] = useState(text);
     const inputRef = useRef();
 
-    const toggleComplete = id => {
-        // console.log('dfdf');
-        if ( isComplete ) {
+    const toggleComplete = (id, event) => {
+        // console.log('dfdf');\
+        event.stopPropagation();
+        if (isComplete) {
             uncompleteTodo(id);
         } else {
             completeTodo(id);
         }
     }
-    const startEditting = () => {
+    const startEditting = (event) => {
         // setEditValue(text);
         // if( inputRef.current ){
         //     inputRef.current.focus();
         // }
+        event.stopPropagation();
         setEditMode(true);
     }
-    const endEditting = () => {
+    const endEditting = (event) => {
         // setEditValue()
+        event.stopPropagation();
         updateTodo(id, editValue);
         setEditMode(false);
     }
@@ -47,10 +50,10 @@ const Todo = ({ id, text, isComplete, deleteTodo, completeTodo, uncompleteTodo, 
     }
 
     useEffect(() => {
-        if(editMode){
+        if (editMode) {
             inputRef.current.focus();
         }
-    }, [ editMode ]);
+    }, [editMode]);
 
     return (
         <View style={styles.container}>
@@ -60,7 +63,7 @@ const Todo = ({ id, text, isComplete, deleteTodo, completeTodo, uncompleteTodo, 
                     <View style={[
                         styles.circle,
                         isComplete ? styles.completedCircle : styles.uncompltedCircle
-                    ]}/>
+                    ]} />
                 </TouchableOpacity>
                 {editMode ?
                     (<TextInput
@@ -79,13 +82,13 @@ const Todo = ({ id, text, isComplete, deleteTodo, completeTodo, uncompleteTodo, 
                         onBlur={endEditting}
                     />
                     ) : (
-                    <Text
-                        style={[
-                            styles.text, 
-                            isComplete ? styles.completedText : styles.uncompltedText
+                        <Text
+                            style={[
+                                styles.text,
+                                isComplete ? styles.completedText : styles.uncompltedText
                             ]}>
-                        {editValue.length > MAX_TODO_LEN ? editValue.slice(0, MAX_TODO_LEN) + '...' : editValue}
-                    </Text>
+                            {editValue.length > MAX_TODO_LEN ? editValue.slice(0, MAX_TODO_LEN) + '...' : editValue}
+                        </Text>
                     )}
             </View>
             {editMode ?
@@ -102,7 +105,12 @@ const Todo = ({ id, text, isComplete, deleteTodo, completeTodo, uncompleteTodo, 
                             <MaterialCommunityIcons name='pencil-box-outline' size={ICON_SIZE} color='#900B3D' />
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => deleteTodo(id)}>
+                    <TouchableOpacity 
+                        onPress={event => {
+                            event.stopPropagation();
+                            deleteTodo(id);
+                        }}
+                    >
                         <View style={styles.actionContainer}>
                             <MaterialCommunityIcons name='delete' size={ICON_SIZE} color='#571745' />
                         </View>
@@ -173,7 +181,7 @@ const styles = StyleSheet.create({
         // paddingHorizontal: 5
     },
     input: {
-        width: ( width / 2 ) + 10,
+        width: (width / 2) + 10,
     }
 })
 
